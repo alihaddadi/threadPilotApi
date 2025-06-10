@@ -1,0 +1,8 @@
+﻿@threadPilotInsuranceInfo_HostAddress = http://localhost:7185
+
+POST {{threadPilotInsuranceInfo_HostAddress}}/api/insuranceinfo
+Content-Type : application/json
+{
+  "SSN": "123456789"
+}
+###

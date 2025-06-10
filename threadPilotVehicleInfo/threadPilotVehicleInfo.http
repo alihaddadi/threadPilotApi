@@ -1,0 +1,5 @@
+﻿@threadPilotVehicleInfo_HostAddress = http://localhost:7208
+
+
+GET {{threadPilotVehicleInfo_HostAddress}}/api/getvehicle/LMN456
+###
