@@ -37,6 +37,11 @@ namespace threadpilot
             }
 
             // Example: parse JSON body to get 'platenumber'
+            // if (string.IsNullOrEmpty(requestBody))
+            // 
+            {
+                return new BadRequestObjectResult("Request body is empty");
+            }
             string ssn = "";
             if (!string.IsNullOrEmpty(requestBody))
             {
