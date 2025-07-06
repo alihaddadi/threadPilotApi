@@ -1,4 +1,4 @@
-﻿namespace threadpilot.models.insurance;
+﻿namespace threadPilotModel;
 
 public class Insurance
 {
@@ -15,5 +15,16 @@ public class Insurance
         InsurancePrice = insurancePrice;
         InsuranceType = insuranceType;
         VehicleRegistrationNumber = vehicleRegistrationNumber;
+    }
+}
+public class InsuranceRequestModel
+{
+    public string SSN { get; set; }
+ 
+
+    public InsuranceRequestModel(string ssn)
+    {
+        SSN = ssn;
+        
     }
 }

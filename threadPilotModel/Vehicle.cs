@@ -1,4 +1,4 @@
-﻿namespace threadpilot.models.vehicle;
+﻿namespace threadPilotModel;
 public class Vehicle
 {
     public string RegistrationNumber { get; set; }

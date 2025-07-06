@@ -1,9 +1,14 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using threadpilot.models.insurance;
+using System.Net;
+using Microsoft.OpenApi.Models;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
+using threadPilotModel;
 
 
 namespace threadpilot
@@ -22,7 +27,18 @@ namespace threadpilot
 
         }
 
-        [Function("getInsuranceInfo")]
+        [Function("getInsurance")]
+        [OpenApiOperation(operationId: "getInsuranceInfo")]
+       // [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
+        [OpenApiRequestBody("application/json", typeof(InsuranceRequestModel),
+                   Description = "JSON request body containing { \"ssn\" : \"social security number\"}")]
+
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Vehicle),
+            Description = "The OK response returns insurance information.")]
+
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.NotFound, contentType: "application/json", bodyType: typeof(_404_Response),
+            Description = "The 404 response returns an error code and message.")]
+
         public IActionResult Run([HttpTrigger(AuthorizationLevel.Function, "POST", Route = "insuranceinfo")] HttpRequest req)
         {
             _logger.LogInformation("POST:{URL} method:{handlerName}", req.GetDisplayUrl(), this.ToString());
@@ -48,7 +64,7 @@ namespace threadpilot
             var results = mockedInsurances.FirstOrDefault(v => v.SSN == ssn);
             if (results == null)
             {
-                return new NotFoundObjectResult("No customers found with the given social security number");
+                return new NotFoundObjectResult(new _404_Response(err_msg: $"No insurance found with ssn: {ssn}", err_cod: 1));
             }
 
             return new OkObjectResult(new Insurance

@@ -5,7 +5,10 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using System.Net;
-using threadpilot.models.vehicle;
+using Microsoft.OpenApi.Models;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
+using threadPilotModel;
 
 namespace threadpilot
 {
@@ -23,14 +26,27 @@ namespace threadpilot
 
         }
 
-        [Function("getVehicleInfo")]
-        public IActionResult Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = "getvehicle/{platenumber}")] HttpRequest req, string platenumber)
+        [Function("getvehicle")]
+        [OpenApiOperation(operationId: "getvehicleInfo")]
+       // [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
+        //   [OpenApiRequestBody("application/json", typeof(RequestBodyModel),
+        //           Description = "JSON request body containing { hours, capacity}")]
+
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Vehicle),
+            Description = "The OK response returns vehicle information.")]
+
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.NotFound, contentType: "application/json", bodyType: typeof(_404_Response),
+            Description = "The 404 response returns an error code and message.")]
+
+        public IActionResult Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = "getvehicle/{platenumber}")]
+                                 HttpRequest req, string platenumber
+                                )
         {
             _logger.LogInformation("GET:{URL} method:{handlerName}", req.GetDisplayUrl(), this.ToString());
             var results = mockedVehicles.FirstOrDefault(v => v.RegistrationNumber == platenumber);
             if (results == null)
             {
-                return new NotFoundObjectResult($"No vehicles found with plate number: {platenumber}");
+                return new NotFoundObjectResult( new _404_Response(err_msg: $"No vehicles found with plate number: {platenumber}", err_cod: 1));
             }
             return new OkObjectResult(new Vehicle
                    (results.RegistrationNumber,
