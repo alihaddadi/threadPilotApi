@@ -44,6 +44,8 @@ namespace threadpilot
             _logger.LogInformation("POST:{URL} method:{handlerName}", req.GetDisplayUrl(), this.ToString());
 
             // Read POST body
+            // Note: In a real-world scenario, you should use asynchronous methods to read the body.
+            // Here we use synchronous reading for simplicity, but it's not recommended in production code.
             string requestBody;
             using (var reader = new StreamReader(req.Body))
             {
@@ -51,6 +53,11 @@ namespace threadpilot
             }
 
             // Example: parse JSON body to get 'platenumber'
+            // if (string.IsNullOrEmpty(requestBody))
+            // 
+            {
+                return new BadRequestObjectResult("Request body is empty");
+            }
             string ssn = "";
             if (!string.IsNullOrEmpty(requestBody))
             {
